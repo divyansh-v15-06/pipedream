@@ -1,0 +1,6 @@
+version: pipedream-ir2vec-v1
+mode: symbolic
+dimension: 300
+executable: llvm-ir2vec
+args:
+  - "{input}"

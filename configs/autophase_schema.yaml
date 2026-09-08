@@ -1,0 +1,58 @@
+version: pipedream-autophase-v1
+features:
+  - {name: instruction_count, kind: scalar, description: non-debug instructions in defined functions}
+  - {name: function_count, kind: scalar, description: defined LLVM functions}
+  - {name: defined_function_count, kind: scalar, description: defined LLVM functions}
+  - {name: basic_block_count, kind: scalar, description: basic blocks in defined functions}
+  - {name: argument_count, kind: scalar, description: formal arguments of defined functions}
+  - {name: global_count, kind: scalar, description: global definitions}
+  - {name: metadata_count, kind: scalar, description: metadata definitions}
+  - {name: debug_intrinsic_count, kind: scalar, description: debug intrinsic calls}
+  - {name: phi_count, kind: opcode, description: phi instructions}
+  - {name: alloca_count, kind: opcode, description: alloca instructions}
+  - {name: load_count, kind: opcode, description: load instructions}
+  - {name: store_count, kind: opcode, description: store instructions}
+  - {name: getelementptr_count, kind: opcode, description: getelementptr instructions}
+  - {name: call_count, kind: opcode, description: call instructions}
+  - {name: invoke_count, kind: opcode, description: invoke instructions}
+  - {name: ret_count, kind: opcode, description: ret instructions}
+  - {name: br_count, kind: opcode, description: br instructions}
+  - {name: switch_count, kind: opcode, description: switch instructions}
+  - {name: indirectbr_count, kind: opcode, description: indirectbr instructions}
+  - {name: unreachable_count, kind: opcode, description: unreachable instructions}
+  - {name: icmp_count, kind: opcode, description: icmp instructions}
+  - {name: fcmp_count, kind: opcode, description: fcmp instructions}
+  - {name: select_count, kind: opcode, description: select instructions}
+  - {name: add_count, kind: opcode, description: add instructions}
+  - {name: sub_count, kind: opcode, description: sub instructions}
+  - {name: mul_count, kind: opcode, description: mul instructions}
+  - {name: udiv_count, kind: opcode, description: udiv instructions}
+  - {name: sdiv_count, kind: opcode, description: sdiv instructions}
+  - {name: fadd_count, kind: opcode, description: fadd instructions}
+  - {name: fsub_count, kind: opcode, description: fsub instructions}
+  - {name: fmul_count, kind: opcode, description: fmul instructions}
+  - {name: fdiv_count, kind: opcode, description: fdiv instructions}
+  - {name: and_count, kind: opcode, description: and instructions}
+  - {name: or_count, kind: opcode, description: or instructions}
+  - {name: xor_count, kind: opcode, description: xor instructions}
+  - {name: shl_count, kind: opcode, description: shl instructions}
+  - {name: lshr_count, kind: opcode, description: lshr instructions}
+  - {name: ashr_count, kind: opcode, description: ashr instructions}
+  - {name: trunc_count, kind: opcode, description: trunc instructions}
+  - {name: zext_count, kind: opcode, description: zext instructions}
+  - {name: sext_count, kind: opcode, description: sext instructions}
+  - {name: bitcast_count, kind: opcode, description: bitcast instructions}
+  - {name: ptrtoint_count, kind: opcode, description: ptrtoint instructions}
+  - {name: inttoptr_count, kind: opcode, description: inttoptr instructions}
+  - {name: sitofp_count, kind: opcode, description: sitofp instructions}
+  - {name: fptosi_count, kind: opcode, description: fptosi instructions}
+  - {name: freeze_count, kind: opcode, description: freeze instructions}
+  - {name: extractvalue_count, kind: opcode, description: extractvalue instructions}
+  - {name: insertvalue_count, kind: opcode, description: insertvalue instructions}
+  - {name: extractelement_count, kind: opcode, description: extractelement instructions}
+  - {name: insertelement_count, kind: opcode, description: insertelement instructions}
+  - {name: shufflevector_count, kind: opcode, description: shufflevector instructions}
+  - {name: landingpad_count, kind: opcode, description: landingpad instructions}
+  - {name: resume_count, kind: opcode, description: resume instructions}
+  - {name: function_attribute_count, kind: scalar, description: function attribute groups}
+  - {name: loop_hint_count, kind: scalar, description: llvm.loop metadata references}
