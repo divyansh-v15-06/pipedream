@@ -1,0 +1,246 @@
+{
+  "records": [
+    {
+      "benchmark_id": "smoke_001_arith",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "45b717133b873800ad962997da71f91d079ec2e4f00202f687760acd0afdb686",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/arith.c",
+      "source_family": "arith_family",
+      "source_sha256": "03a6241ae206e151a7e08c62846fe46ccc121b4182af8abb2b3b7ed7b4d3035f",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_002_arrays",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "e64f6f3eb26ac206d9a3bb2ff2b38d36d81ff5ad829707e3099440a7d2a68de5",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/arrays.c",
+      "source_family": "arrays_family",
+      "source_sha256": "3692a2e9419c17df80dcabf457b8ff05a6e65c9dad2cb96da70b0cb1a96136de",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_003_bools",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "0c5c87b620c7c6a181b8336c2749814024dcddfa30a5d637339c83864d149b1c",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/bools.c",
+      "source_family": "bools_family",
+      "source_sha256": "d2a158e2185d9d7058db1189f59c766d0d73e85610475153d0f7009f0fb0c0fe",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_004_branches",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "e8309b439e92af28c3260b120d6f897982f7059bdd299bf6e3d8ca106c9af1dd",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/branches.c",
+      "source_family": "branches_family",
+      "source_sha256": "a9f26fc4a5bed15798b76316497b500270c163a9536dee4313b89f5c110fdc05",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_005_clamp",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "88f21fa486c460383d32810f88ae96206fe4f6dfc56cc709f7d3eb39172005ed",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/clamp.c",
+      "source_family": "clamp_family",
+      "source_sha256": "3a84f2c2538d2e93ef2184f3baef65aa5672242dc7983987afbe96acc25de72e",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_006_dot",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "886a115444d01eb6fbd3da607e01ad6690555a828c87df6b2617b55f3d18eb68",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/dot.c",
+      "source_family": "dot_family",
+      "source_sha256": "e3ba7bd1ef9723628280bf725ff02a8c1ef9e73e2adab6ad0c906dcb5d92fe29",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_007_fib",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "6520c2cb9dad45a77b8b6438b5ea30017540982f9b493b346375a03f53c68879",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/fib.c",
+      "source_family": "fib_family",
+      "source_sha256": "c6fdd5e7528b7225992696cdb84776938773ca2322f08eddc308092518d9f9ff",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_008_gcd",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "2f6eba23d5090180e32b9f0e1552e5758c5680a715e8bdfe4a67118c19dd5027",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/gcd.c",
+      "source_family": "gcd_family",
+      "source_sha256": "0bc953c030fc8df531ce1241dae195a6a355db476bb0567cda25af39288c2363",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_009_loops",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "74bab575f904a2813aa663e6a3ecdc203696ddd5d56b54c7a019334c01be14b8",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/loops.c",
+      "source_family": "loops_family",
+      "source_sha256": "51f594270638fc93cc5dbdee08456f6e3275933afd748bc6a1c7414c1a9696a9",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_010_minmax",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "5c522b4fb9d9bef24ad92b39307b4a6cf6da347d0622292e9f9fb235a3ebeb1b",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/minmax.c",
+      "source_family": "minmax_family",
+      "source_sha256": "db754f87c843ff9076b9a117b3a408979c4240dbb8c82c00c5bef82aeca239e2",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_011_polynomial",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "4bde8e308b52db9b3393407cf6829f2fd17ce68adbf56e68376f9d0100710a6d",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/polynomial.c",
+      "source_family": "polynomial_family",
+      "source_sha256": "f6305b18ac9a549d081170affa63cd70e8ac0786c83d783d15002f9de4fc05ae",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    },
+    {
+      "benchmark_id": "smoke_012_sum",
+      "compiler_flags": [
+        "-O0",
+        "-Xclang",
+        "-disable-O0-optnone",
+        "-fno-discard-value-names",
+        "-emit-llvm",
+        "-c"
+      ],
+      "initial_ir_sha256": "4e4e0cd3a1b01e24616541dde733e8fdca3b62d2688970a6a41bf4f04f6a0a0a",
+      "language": "c",
+      "llvm_version": "llvm20",
+      "source": "smoke/sum.c",
+      "source_family": "sum_family",
+      "source_sha256": "56db14eff0da9c41112e0da87191c2d0003f960362be944f859b8be93b3a39dd",
+      "split": "smoke",
+      "standard": "c11",
+      "target_triple": "x86_64-unknown-linux-gnu"
+    }
+  ],
+  "schema_version": "pipedream-manifest-v1",
+  "tier": "smoke"
+}
