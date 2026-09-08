@@ -1,0 +1,51 @@
+version: llvm20-v1
+llvm_major: "20"
+passes:
+  - action_id: 0
+    name: mem2reg
+    pipeline: mem2reg
+    category: scalar
+  - action_id: 1
+    name: sroa
+    pipeline: sroa
+    category: scalar
+  - action_id: 2
+    name: instcombine
+    pipeline: instcombine
+    category: scalar
+  - action_id: 3
+    name: simplifycfg
+    pipeline: simplifycfg
+    category: cfg
+  - action_id: 4
+    name: early-cse
+    pipeline: early-cse
+    category: scalar
+  - action_id: 5
+    name: gvn
+    pipeline: gvn
+    category: scalar
+  - action_id: 6
+    name: dce
+    pipeline: dce
+    category: cleanup
+  - action_id: 7
+    name: adce
+    pipeline: adce
+    category: cleanup
+  - action_id: 8
+    name: reassociate
+    pipeline: reassociate
+    category: scalar
+  - action_id: 9
+    name: loop-simplify
+    pipeline: loop-simplify
+    category: loop
+  - action_id: 10
+    name: licm
+    pipeline: licm
+    category: loop
+  - action_id: 11
+    name: indvars
+    pipeline: indvars
+    category: loop
