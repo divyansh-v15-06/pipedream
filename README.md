@@ -29,6 +29,23 @@ The policy must be trained on the training programs and evaluated on completely 
 
 The project does not assume that IR2Vec will beat Autophase. A clear negative result is valuable if the comparison is controlled and reproducible.
 
+## Current Implementation Status
+
+The repository has completed the toolchain baseline and deterministic pass engine. The current implementation includes:
+
+- a Python 3.11 and LLVM 20 development container;
+- a generated and pinned `uv.lock` plus a versioned 12-action pass catalog;
+- transactional LLVM pass execution with verification, timeout handling, rollback, and content-addressed caching;
+- non-debug instruction counting and JSONL step-trace records;
+- a sequence replay CLI that writes final bitcode, a JSONL trace, and a summary artifact; and
+- a container smoke test that compiles, optimizes, verifies, disassembles, and reassembles LLVM bitcode.
+
+The current vertical slice also includes a 12-program checksum manifest, a deterministic Gymnasium environment, LLVM pipeline/random/greedy/beam baselines, a project-owned 56-feature representation, training-only normalization, PPO smoke and development-pilot training, deterministic held-out evaluation, and paired analysis utilities. Research-scale AnghaBench acquisition, main-scale training, final figures, and the empirical IR2Vec comparison remain open. IR2Vec is intentionally validated in the later representation-study milestone rather than treated as a M0 dependency.
+
+### Do We Need To Train PPO?
+
+Yes. The short smoke model only verifies that PPO, LLVM, observations, rewards, checkpointing, and evaluation connect correctly. It is not a research result. A defensible result requires training on the training split with multiple seeds, selecting a checkpoint using validation programs only, and evaluating that locked checkpoint once on unseen test programs. The current pilot commands exercise this protocol with a tiny timestep budget; final training must use a substantially larger predeclared budget.
+
 ## Contribution Boundary
 
 Prior work has already applied deep reinforcement learning to LLVM pass ordering in the HLS domain. CompilerGym has also provided LLVM optimization environments, Autophase observations, AnghaBench benchmarks, and instruction-count/code-size rewards.
@@ -54,7 +71,7 @@ These choices are deliberately conservative. Changing one after experiments begi
 | Area | Initial decision |
 |---|---|
 | Host environment | Ubuntu 24.04 container or an equivalent Linux host |
-| LLVM toolchain | LLVM/Clang/opt 20.1.0, pinned and recorded |
+| LLVM toolchain | LLVM/Clang/opt 20.x from apt.llvm.org, with exact package versions recorded |
 | Python | Python 3.11 |
 | Python environment | uv, pyproject.toml, and committed uv.lock |
 | RL environment API | Gymnasium Env with reset/step/terminated/truncated |
@@ -157,7 +174,7 @@ Each episode owns:
 
 ### Action space
 
-The initial catalog contains these pass names, subject to validation against LLVM 20.1.0:
+The initial catalog contains these pass names, subject to validation against the pinned LLVM 20.x package set:
 
 ~~~text
 mem2reg
@@ -385,10 +402,9 @@ The implementation will use a src layout:
 │
 ├── configs/
 │   ├── smoke.yaml
-│   ├── baseline.yaml
-│   ├── ppo_autophase.yaml
-│   ├── ppo_ir2vec.yaml
-│   └── ppo_hybrid.yaml
+│   ├── pass_catalog.yaml
+│   ├── autophase_schema.yaml
+│   └── ir2vec.yaml
 │
 ├── src/pipedream/
 │   ├── cli/
@@ -398,17 +414,12 @@ The implementation will use a src layout:
 │   ├── agents/
 │   ├── benchmarks/
 │   ├── evaluation/
-│   ├── instrumentation/
-│   └── visualization/
-│
-├── llvm/
-│   ├── autophase/
-│   ├── metrics/
-│   └── ir2vec/
+│   └── analysis/
 │
 ├── benchmarks/
 │   ├── manifest.json
-│   └── README.md
+│   ├── pilot_manifest.json
+│   └── smoke/
 │
 ├── tests/
 │   ├── fixtures/
@@ -421,8 +432,7 @@ The implementation will use a src layout:
 │
 ├── scripts/
 │   ├── smoke_test.sh
-│   ├── benchmark_all.sh
-│   └── reproduce_results.sh
+│   └── reproduce_smoke.sh
 │
 ├── results/
 │   ├── raw/
@@ -430,10 +440,10 @@ The implementation will use a src layout:
 │   ├── figures/
 │   └── tables/
 │
-└── docs/
-    ├── methodology.md
-    ├── experiment_protocol.md
-    └── limitations.md
+├── context.md
+├── train.md
+├── remaining_work.md
+└── TODO.md
 ~~~
 
 Do not create every directory before it is needed. Each phase must leave a working artifact and tests.
@@ -442,7 +452,7 @@ Do not create every directory before it is needed. Each phase must leave a worki
 
 ### M0: Toolchain and container
 
-Install and verify LLVM 20.1.0, Clang, opt, llvm-dis, llvm-as, and llvm-ir2vec. Compile a smoke program, generate canonical IR, run explicit new-pass-manager pipelines, and verify the output.
+Install and verify the pinned LLVM 20.x package set, Clang, opt, llvm-dis, and llvm-as. Compile a smoke program, generate canonical IR, run explicit new-pass-manager pipelines, and verify the output. IR2Vec is validated separately in M7 when its representation settings are frozen.
 
 Gate: the smoke script succeeds on a clean environment and records tool versions.
 
