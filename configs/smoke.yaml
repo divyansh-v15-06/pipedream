@@ -1,0 +1,9 @@
+toolchain:
+  llvm_major: "20"
+  target_triple: "x86_64-unknown-linux-gnu"
+
+episode:
+  max_steps: 12
+
+reward:
+  name: normalized_instruction_delta

@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=75,<76"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pipedream"
+version = "0.1.0"
+description = "Program-adaptive reinforcement learning for LLVM pass ordering"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "gymnasium>=1.0,<2",
+    "numpy>=2.0,<3",
+    "pyyaml>=6.0,<7",
+]
+
+[project.optional-dependencies]
+rl = [
+    "stable-baselines3>=2.6,<3",
+    "tensorboard>=2.18,<3",
+    "torch>=2.5,<3",
+]
+analysis = [
+    "matplotlib>=3.9,<4",
+    "pandas>=2.2,<3",
+    "pyarrow>=18,<20",
+    "scipy>=1.14,<2",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.14,<2",
+    "pytest>=8.3,<9",
+    "ruff>=0.9,<1",
+]
+
+[project.scripts]
+pipedream-smoke = "pipedream.cli.smoke:main"
+pipedream-sequence = "pipedream.cli.sequence:main"
+pipedream-manifest = "pipedream.cli.manifest:main"
+pipedream-baselines = "pipedream.cli.baselines:main"
+pipedream-train = "pipedream.cli.train:main"
+pipedream-evaluate = "pipedream.cli.evaluate:main"
+pipedream-analyze = "pipedream.cli.analyze:main"
+pipedream-fit-normalizer = "pipedream.cli.fit_normalizer:main"
+pipedream-split-manifest = "pipedream.cli.split_manifest:main"
+pipedream-select-checkpoint = "pipedream.cli.select_checkpoint:main"
+pipedream-report = "pipedream.cli.report:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
