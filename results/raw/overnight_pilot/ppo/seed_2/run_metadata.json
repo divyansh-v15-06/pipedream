@@ -1,0 +1,9 @@
+{
+  "manifest": "benchmarks/pilot_manifest.json",
+  "normalization_stats": "results/raw/overnight_pilot/normalization_train.json",
+  "records": 8,
+  "schema": "configs/autophase_schema.yaml",
+  "seed": 2,
+  "split": "train",
+  "tier": "pilot"
+}

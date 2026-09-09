@@ -36,15 +36,19 @@ Completed and verified:
 - Baselines, the 56-feature extractor, training-only normalization, PPO,
   checkpoint selection, deterministic evaluation, and paired bootstrap analysis
   are implemented.
-- Five tiny development-pilot seeds were trained and a validation checkpoint was
-  selected. This proves the protocol wiring, not the research claim.
+- Five development-pilot seeds were trained for 100,000 PPO timesteps each
+  (500,000 total) in `results/raw/overnight_pilot/ppo`. The five checkpoints,
+  per-seed metadata/configuration, and training-only normalization statistics are
+  versioned with the repository. The run completed, but its validation
+  selection and held-out test evaluation are still the next actions.
 
 Open research boundaries:
 
 - The external AnghaBench subset has not been acquired or frozen locally.
 - The development pilot is smoke-derived and is not the final benchmark.
-- The final training budget, main experiment, figures, and held-out result are
-  still open.
+- The main benchmark, final training budget, figures, and final held-out result
+  are still open. The current overnight run is a development-pilot result, not
+  the final research claim.
 - The exact IR2Vec executable/vocabulary and matched ablation are still open.
 
 ## Repository Map

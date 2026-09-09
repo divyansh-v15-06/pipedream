@@ -17,6 +17,128 @@ A defensible run has three separate stages:
 Do not use test results to change the model, budget, split, normalization, or
 hyperparameters.
 
+## Current Training Status (2026-09-09)
+
+The latest completed run is the overnight development-pilot run. It is a real
+trained PPO policy, but it is not yet the final research experiment.
+
+| Item | Recorded value |
+|---|---|
+| Run | `results/raw/overnight_pilot/ppo` |
+| Algorithm/policy | Stable-Baselines3 PPO with `MlpPolicy` |
+| Representation | 56-feature Autophase-compatible vector |
+| Manifest | `benchmarks/pilot_manifest.json` |
+| Split used for training | `train` (8 programs) |
+| Validation/test programs | 2 / 2, kept separate from training |
+| Seeds | 0, 1, 2, 3, 4 |
+| Timesteps | 100,000 per seed; 500,000 total |
+| Rollout / batch | 128 / 64 |
+| Learning rate / gamma | `3e-4` / `0.99` |
+| Episode budget | 12 pass selections |
+| Device | CPU |
+| Status | All five checkpoints completed |
+
+The run started at `2026-09-08T19:49:09+00:00` and completed at
+`2026-09-09T01:39:34+00:00`. The five model files, per-seed configs, metadata,
+and training-only normalization statistics are retained with the repository.
+
+Do not report this pilot as the final research result: the benchmark is
+smoke-derived and the overnight run still needs validation checkpoint
+selection, one locked test evaluation, and baseline comparison.
+
+## Immediate Next Step: Select And Evaluate The Completed Run
+
+Do this before starting another PPO run. These commands use only validation
+records for checkpoint selection and use the test split exactly once.
+
+```bash
+MANIFEST=benchmarks/pilot_manifest.json
+CATALOG=configs/pass_catalog.yaml
+SCHEMA=configs/autophase_schema.yaml
+NORM=results/raw/overnight_pilot/normalization_train.json
+RUN=results/raw/overnight_pilot/ppo
+
+uv run --extra rl pipedream-select-checkpoint \
+  --manifest "$MANIFEST" \
+  --catalog "$CATALOG" \
+  --schema "$SCHEMA" \
+  --normalization-stats "$NORM" \
+  --models "$RUN/seed_0/ppo_model.zip" \
+           "$RUN/seed_1/ppo_model.zip" \
+           "$RUN/seed_2/ppo_model.zip" \
+           "$RUN/seed_3/ppo_model.zip" \
+           "$RUN/seed_4/ppo_model.zip" \
+  --output results/raw/overnight_pilot/selection.json
+
+MODEL=$(python -c \
+  'import json; print(json.load(open("results/raw/overnight_pilot/selection.json"))["selected_model"])')
+
+uv run --extra rl pipedream-evaluate \
+  --manifest "$MANIFEST" \
+  --catalog "$CATALOG" \
+  --schema "$SCHEMA" \
+  --normalization-stats "$NORM" \
+  --model "$MODEL" \
+  --split test \
+  --output results/raw/overnight_pilot/test.jsonl \
+  --max-steps 12
+```
+
+After the test evaluation is written, run the matching baselines and paired
+analysis. Do not use the test output to change the selected checkpoint or PPO
+configuration.
+
+## Next Training Specification: Main Benchmark
+
+The next actual training run should use a frozen, family-aware main manifest
+with legally usable benchmark sources. Acquire and validate that manifest
+before training; do not substitute the 12-program pilot for the main result.
+
+Predeclare this configuration for the first main run:
+
+| Parameter | Value |
+|---|---|
+| Algorithm | PPO, Stable-Baselines3 `MlpPolicy` |
+| Observation | 56-feature Autophase-compatible vector |
+| Action space | 12-pass catalog in `configs/pass_catalog.yaml` |
+| Reward | Relative instruction-count reduction |
+| Training split | Main manifest `train` only |
+| Seeds | `0 1 2 3 4` |
+| Timesteps | 500,000 per seed; 2,500,000 total |
+| Rollout steps | 128 |
+| Batch size | 64 |
+| Learning rate | `0.0003` |
+| Discount factor | `0.99` |
+| Episode max steps | 12 |
+| Device | `auto` (record the resolved device) |
+| Normalization | Fit on training IR only; freeze before validation/test |
+| Selection | Best mean instruction reduction on validation only |
+| Final evaluation | One pass on the locked test split |
+
+Use the following command after replacing `MANIFEST` with the frozen main
+manifest and fitting its training-only normalization statistics:
+
+```bash
+uv run --extra rl pipedream-train \
+  --manifest "$MANIFEST" \
+  --catalog "$CATALOG" \
+  --schema "$SCHEMA" \
+  --normalization-stats results/raw/main/normalization_train.json \
+  --split train \
+  --output-dir results/raw/main/ppo \
+  --seeds 0 1 2 3 4 \
+  --total-timesteps 500000 \
+  --rollout-steps 128 \
+  --batch-size 64 \
+  --max-steps 12 \
+  --device auto
+```
+
+The 500,000-step main budget is a predeclared starting point, not a claim that
+more steps always improve results. If convergence or compute cost requires a
+change, record the new budget and create a new experiment directory before
+using any test results.
+
 ## Environment
 
 The preferred environment is the repository's Docker image. A local Python
@@ -89,8 +211,8 @@ changes.
 
 Before the main run, predeclare the timestep budget, rollout length, batch
 size, episode budget, seeds, and device in the experiment record. The command
-below shows a practical starting point; the 16-step pilot budget is only a
-smoke setting and must not be used as the final claim.
+below is the locked starting specification described above. The 16-step pilot
+budget is only a smoke setting and must not be used as the final claim.
 
 ```bash
 uv run --extra rl pipedream-train \
@@ -99,9 +221,9 @@ uv run --extra rl pipedream-train \
   --schema "$SCHEMA" \
   --normalization-stats results/raw/normalization_train.json \
   --split train \
-  --output-dir results/raw/ppo_main \
+  --output-dir results/raw/main/ppo \
   --seeds 0 1 2 3 4 \
-  --total-timesteps 100000 \
+  --total-timesteps 500000 \
   --rollout-steps 128 \
   --batch-size 64 \
   --max-steps 12 \
@@ -124,12 +246,12 @@ uv run --extra rl pipedream-select-checkpoint \
   --catalog "$CATALOG" \
   --schema "$SCHEMA" \
   --normalization-stats results/raw/normalization_train.json \
-  --models results/raw/ppo_main/seed_0/ppo_model.zip \
-           results/raw/ppo_main/seed_1/ppo_model.zip \
-           results/raw/ppo_main/seed_2/ppo_model.zip \
-           results/raw/ppo_main/seed_3/ppo_model.zip \
-           results/raw/ppo_main/seed_4/ppo_model.zip \
-  --output results/raw/ppo_main/selection.json
+  --models results/raw/main/ppo/seed_0/ppo_model.zip \
+           results/raw/main/ppo/seed_1/ppo_model.zip \
+           results/raw/main/ppo/seed_2/ppo_model.zip \
+           results/raw/main/ppo/seed_3/ppo_model.zip \
+           results/raw/main/ppo/seed_4/ppo_model.zip \
+  --output results/raw/main/selection.json
 ```
 
 The selection artifact records the validation split and chosen model. Keep it
@@ -142,7 +264,7 @@ locked test split:
 
 ```bash
 MODEL=$(python -c \
-  'import json; print(json.load(open("results/raw/ppo_main/selection.json"))["selected_model"])')
+  'import json; print(json.load(open("results/raw/main/selection.json"))["selected_model"])')
 
 uv run --extra rl pipedream-evaluate \
   --manifest "$MANIFEST" \
@@ -151,7 +273,7 @@ uv run --extra rl pipedream-evaluate \
   --normalization-stats results/raw/normalization_train.json \
   --model "$MODEL" \
   --split test \
-  --output results/raw/ppo_main/test.jsonl \
+  --output results/raw/main/test.jsonl \
   --max-steps 12
 ```
 

@@ -1,0 +1,12 @@
+{
+  "config": {
+    "batch_size": 64,
+    "device": "cpu",
+    "gamma": 0.99,
+    "learning_rate": 0.0003,
+    "rollout_steps": 128,
+    "seed": 0,
+    "total_timesteps": 100000
+  },
+  "config_checksum": "25b48060de86bd476bbab150092db1904390517c19cd0febb9855bb9210041c0"
+}
