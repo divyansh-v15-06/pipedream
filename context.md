@@ -87,6 +87,18 @@ checkpoints, tuning hyperparameters, or deciding when to stop training. Every
 result should retain its manifest, configuration, seed, model path, toolchain,
 and failure records.
 
+### Required First Check On A Different Machine
+
+Before any training-related action, inspect the active host's CPU, RAM, free
+disk, GPU/VRAM, and whether CUDA is visible inside Docker. `train.md` contains
+the exact commands and the decision table. If those specifications differ from
+the documented workstation profile, update `README.md` and `train.md` with the
+new dated profile before selecting device, parallelism, or budget. Then record
+the resolved device and hardware details in the new experiment directory.
+
+For analysis-only work, read the existing profile and run metadata; do not
+rewrite the profile just because the analysis agent is on a different host.
+
 Useful checks:
 
 ```bash

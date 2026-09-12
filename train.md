@@ -69,6 +69,42 @@ exist before scheduling the remaining four sequentially. A main run of five
 500,000-step seeds may take multiple overnight sessions on this machine, so
 use a new named run directory rather than overwriting a completed pilot.
 
+### Mandatory Host Check For A New Agent Or Machine
+
+This table is a snapshot, not an assumption that every contributor has the
+same computer. Before an agent starts, resumes, tunes, or evaluates a training
+run, it must inspect the machine it is actually using:
+
+```bash
+lscpu
+free -h
+nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader || true
+df -h .
+docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi || true
+```
+
+If CPU model/thread count, available RAM, GPU name/VRAM, driver/CUDA access, or
+free storage differs materially from the table above, first update the
+**Training Workstation Profile** in `README.md` and the table in this file.
+Record the date, host/container distinction, and the device selected for the
+run in that run's metadata. Do this before choosing a timestep budget or
+starting a seed; do not copy a CPU/GPU recommendation from another machine.
+
+Use the observations to decide the next action:
+
+| Observed condition | Next action |
+|---|---|
+| No CUDA device inside the container | Use `--device cpu`; do not attempt GPU training. |
+| 8 GiB laptop GPU and the current small MLP | Prefer CPU; benchmark one short CUDA seed only if desired. |
+| GPU with enough VRAM and a larger future network/vectorized environment | Run a recorded CPU-vs-CUDA pilot, then lock one device for the full comparison. |
+| Less than 6 GiB free RAM or low disk space | Stop before training; free capacity or reduce only a newly declared pilot budget. |
+| More CPU cores/RAM than this workstation | Still begin with one seed and measure LLVM throughput before adding controlled parallelism. |
+
+An agent doing analysis only should inspect existing artifacts and the recorded
+profile, but must not change hardware recommendations merely because it is
+running in a different environment. Update the profile only when preparing or
+reviewing an experiment that will use that environment.
+
 ### Optional Live Monitor
 
 The monitor is read-only and runs on the host. In another terminal, after the

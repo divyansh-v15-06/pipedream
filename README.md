@@ -402,6 +402,13 @@ machine: run them sequentially and preserve the complete artifact directory
 for every seed. See [train.md](train.md) for hardware-aware commands and the
 monitoring workflow.
 
+This profile must be verified by each agent before starting training on a new
+host. If the active machine differs, update this section and `train.md` with a
+dated specification before choosing device, seed concurrency, or a budget.
+Analysis-only agents should read the recorded profile and run metadata, not
+replace it with their own machine details. The next-step decision table and
+inspection commands are in [train.md](train.md).
+
 ## Repository Structure
 
 The implementation will use a src layout:

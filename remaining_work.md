@@ -51,6 +51,39 @@ research question.
 - Add a clean-room reproduction job that starts from the pinned container and
   verifies the complete smoke/pilot pipeline.
 
+## Recommendations To Make The Project Top-Notch
+
+These are high-value improvements that preserve the core research question.
+Take them in this order; none authorizes changing a frozen experiment after
+looking at its test results.
+
+1. **Automate CI and clean-room reproduction.** Run unit tests, linting, the
+   Docker smoke test, and a short end-to-end PPO/evaluation fixture on every
+   pull request. Publish the commands and artifact checksums.
+2. **Create a benchmark provenance ledger.** For every main-program source,
+   store license, origin URL/revision, family ID, source/IR checksums, compile
+   flags, and exclusion reason. Add duplicate detection before split locking.
+3. **Make experiment tracking immutable.** Write one machine-readable run
+   manifest that includes commit SHA, hardware, image digest, seeds, resolved
+   device, all hyperparameters, input checksums, and output checksums; reject
+   accidental writes into an existing completed run directory.
+4. **Add regression and metamorphic compiler tests.** Test no-op, timeout,
+   rollback, cache invalidation, deterministic replay, and equivalent-source
+   transformations. LLVM verification alone is necessary but not a complete
+   semantic correctness claim.
+5. **Strengthen the evaluation plan before the main run.** Pre-register the
+   primary metric, effect size, confidence interval, paired test, multiple-test
+   correction, failure handling, and compute-budget accounting. Generate every
+   table and figure from raw JSONL through one command.
+6. **Measure the real bottleneck.** Profile compile/pass time, cache hit rate,
+   representation time, policy inference, RAM, and GPU utilization. Optimize
+   data collection or caching only after this evidence; the current MLP may not
+   benefit from GPU acceleration.
+7. **Publish an auditable result package.** Include frozen manifests,
+   selection record, raw per-program outcomes, failed cases, environment
+   capture, trained checkpoints where licensing allows, and a concise
+   limitations statement.
+
 ## Deferred Until The Core Result
 
 Runtime reward as a primary objective, multi-objective optimization, adaptive
