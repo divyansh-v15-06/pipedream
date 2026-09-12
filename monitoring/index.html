@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pipedream · Training Monitor</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark"><span></span><span></span><span></span></div>
+          <div>
+            <div class="eyebrow">PIPEDREAM / LAB</div>
+            <h1>Training monitor</h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <div class="live-indicator"><i></i><span id="connectionLabel">connecting</span></div>
+          <button class="icon-button" id="refreshButton" aria-label="Refresh now" title="Refresh now">↻</button>
+        </div>
+      </header>
+
+      <section class="hero panel">
+        <div class="hero-copy">
+          <div class="eyebrow">OVERNIGHT EXPERIMENT · AUTOPHASE / PPO</div>
+          <h2>Watching the policy learn<br /><em>one pass at a time.</em></h2>
+          <p id="heroDescription">Loading the training run and its live telemetry…</p>
+        </div>
+        <div class="hero-orbit" aria-hidden="true">
+          <div class="orbit orbit-a"></div><div class="orbit orbit-b"></div>
+          <div class="orbit-dot dot-a"></div><div class="orbit-dot dot-b"></div>
+          <div class="core"><span>RL</span><small>ACTIVE</small></div>
+        </div>
+      </section>
+
+      <section class="metric-grid">
+        <article class="metric panel">
+          <div class="metric-label">RUN STATUS <span class="signal"></span></div>
+          <div class="metric-value" id="runStatus">—</div>
+          <div class="metric-meta" id="runStatusMeta">Waiting for telemetry</div>
+        </article>
+        <article class="metric panel">
+          <div class="metric-label">ELAPSED</div>
+          <div class="metric-value mono" id="elapsed">—</div>
+          <div class="metric-meta" id="startedAt">Not started</div>
+        </article>
+        <article class="metric panel">
+          <div class="metric-label">EST. REMAINING</div>
+          <div class="metric-value mono" id="eta">—</div>
+          <div class="metric-meta">Based on current rollout speed</div>
+        </article>
+        <article class="metric panel">
+          <div class="metric-label">CONTAINERS</div>
+          <div class="metric-value" id="containers">—</div>
+          <div class="metric-meta" id="containerMeta">Docker workload</div>
+        </article>
+      </section>
+
+      <section class="main-grid">
+        <article class="panel progress-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">EXPERIMENT PROGRESS</div><h3>Five-seed training sweep</h3></div>
+            <div class="big-percent" id="overallPercent">0.0%</div>
+          </div>
+          <div class="progress-track large"><span id="overallProgress"></span></div>
+          <div class="progress-foot"><span id="overallSteps">0 / 500,000 timesteps</span><span id="activeSeed">No active seed</span></div>
+          <div class="seed-grid" id="seedGrid"></div>
+        </article>
+
+        <aside class="panel resources-panel">
+          <div class="section-heading"><div><div class="eyebrow">COMPUTE TELEMETRY</div><h3>Resources</h3></div><span class="pulse-dot"></span></div>
+          <div class="resource-block">
+            <div class="resource-line"><span>CPU load</span><strong id="cpuValue">—</strong></div>
+            <div class="progress-track"><span id="cpuBar"></span></div>
+            <small id="cpuMeta">—</small>
+          </div>
+          <div class="resource-block">
+            <div class="resource-line"><span>Container memory</span><strong id="memoryValue">—</strong></div>
+            <div class="progress-track"><span id="memoryBar"></span></div>
+            <small id="memoryMeta">—</small>
+          </div>
+          <div class="resource-block">
+            <div class="resource-line"><span>GPU memory</span><strong id="gpuValue">—</strong></div>
+            <div class="progress-track violet"><span id="gpuBar"></span></div>
+            <small id="gpuMeta">—</small>
+          </div>
+          <div class="resource-divider"></div>
+          <div class="compact-row"><span>Active container</span><code id="containerName">—</code></div>
+          <div class="compact-row"><span>Pass cache</span><code id="cacheHint">live</code></div>
+          <div class="compact-row"><span>Refresh cadence</span><code>5 sec</code></div>
+        </aside>
+      </section>
+
+      <section class="lower-grid">
+        <article class="panel run-panel">
+          <div class="section-heading"><div><div class="eyebrow">RUN DETAILS</div><h3>Current experiment</h3></div><span class="tag" id="deviceTag">CPU</span></div>
+          <div class="detail-list">
+            <div><span>Dataset</span><strong>Pilot · 8 train programs</strong></div>
+            <div><span>Algorithm</span><strong>PPO · 5 seeds</strong></div>
+            <div><span>Representation</span><strong>Autophase · 56 features</strong></div>
+            <div><span>Episode budget</span><strong>12 pass applications</strong></div>
+            <div><span>Output</span><code id="outputDir">results/raw/overnight_pilot/ppo</code></div>
+          </div>
+        </article>
+        <article class="panel log-panel">
+          <div class="section-heading"><div><div class="eyebrow">CONTAINER OUTPUT</div><h3>Latest activity</h3></div><span class="tag muted">TAIL 12</span></div>
+          <div class="log-window" id="logWindow"><span class="log-muted">Waiting for container output…</span></div>
+        </article>
+      </section>
+
+      <footer><span>pipedream monitor</span><span id="lastUpdated">—</span></footer>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -46,6 +46,53 @@ Do not report this pilot as the final research result: the benchmark is
 smoke-derived and the overnight run still needs validation checkpoint
 selection, one locked test evaluation, and baseline comparison.
 
+## Hardware-Aware Plan For This Machine
+
+The project currently runs on this workstation:
+
+| Resource | Detected specification | Training implication |
+|---|---|---|
+| CPU | AMD Ryzen 7 7435HS, 8 cores / 16 threads | LLVM compilation and pass execution are CPU-bound. Run one PPO seed at a time. |
+| RAM | 24 GiB installed, 8 GiB swap | Keep at least 6 GiB free; do not parallelize the five seeds. |
+| GPU | NVIDIA GeForce RTX 4060 Laptop GPU, 8 GiB VRAM | Optional for PPO only; it does not accelerate `clang` or `opt`. |
+| Storage | Local workspace volume | Keep checkpoints, TensorBoard events, JSONL, and manifests together under `results/raw/<run-name>/`. |
+
+For the present small `MlpPolicy`, use `--device cpu` as the default. The
+overhead of moving small observations to an 8 GiB laptop GPU can outweigh any
+PPO benefit, while LLVM remains on the CPU. Try `--device cuda` only as a
+separate, documented pilot after `nvidia-smi` works inside the container; never
+mix CPU and CUDA seeds in one comparison without recording that decision.
+
+Use power connected and a performance thermal profile for long runs. Start
+with one seed and confirm its checkpoint, TensorBoard events, and metadata
+exist before scheduling the remaining four sequentially. A main run of five
+500,000-step seeds may take multiple overnight sessions on this machine, so
+use a new named run directory rather than overwriting a completed pilot.
+
+### Optional Live Monitor
+
+The monitor is read-only and runs on the host. In another terminal, after the
+training container has started:
+
+```bash
+python3 monitoring/server.py
+```
+
+Open <http://127.0.0.1:8765>. It reports the configured Docker container,
+per-seed checkpoints/TensorBoard progress, container usage, and GPU telemetry.
+For a different run, configure all three values together:
+
+```bash
+PIPEDREAM_CONTAINER=pipedream-main \
+PIPEDREAM_OUTPUT_DIR=results/raw/main/ppo \
+PIPEDREAM_TOTAL_TIMESTEPS=500000 \
+python3 monitoring/server.py
+```
+
+The monitor never controls training. If its TensorBoard rows are empty, first
+confirm the container name and that the host project is mounted at
+`/workspace` inside the container.
+
 ## Immediate Next Step: Select And Evaluate The Completed Run
 
 Do this before starting another PPO run. These commands use only validation
@@ -235,6 +282,32 @@ Increase it after measuring convergence and compute cost, then record the
 decision before looking at test results. Each multi-seed run writes a model,
 `training_config.json`, `run_metadata.json`, and TensorBoard logs under its
 seed directory.
+
+On the current workstation, run the seed sweep sequentially. The CLI accepts
+multiple seeds, but invoking the command separately makes progress, restart,
+and thermal/power failures easier to isolate:
+
+```bash
+for SEED in 0 1 2 3 4; do
+  uv run --extra rl pipedream-train \
+    --manifest "$MANIFEST" \
+    --catalog "$CATALOG" \
+    --schema "$SCHEMA" \
+    --normalization-stats results/raw/main/normalization_train.json \
+    --split train \
+    --output-dir results/raw/main/ppo \
+    --seeds "$SEED" \
+    --total-timesteps 500000 \
+    --rollout-steps 128 \
+    --batch-size 64 \
+    --max-steps 12 \
+    --device cpu || exit 1
+done
+```
+
+This loop is intentionally resumable by seed, but do not silently replace an
+existing seed checkpoint. If a seed must be rerun, use a fresh experiment
+directory (for example `results/raw/main_rerun_2026-09-13/`) and record why.
 
 ## Select A Validation Checkpoint
 

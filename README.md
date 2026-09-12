@@ -42,6 +42,8 @@ The repository has completed the toolchain baseline and deterministic pass engin
 
 The current vertical slice also includes a 12-program checksum manifest, a deterministic Gymnasium environment, LLVM pipeline/random/greedy/beam baselines, a project-owned 56-feature representation, training-only normalization, PPO smoke and development-pilot training, deterministic held-out evaluation, and paired analysis utilities. Research-scale AnghaBench acquisition, main-scale training, final figures, and the empirical IR2Vec comparison remain open. IR2Vec is intentionally validated in the later representation-study milestone rather than treated as a M0 dependency.
 
+A local, read-only training dashboard is also available in `monitoring/`. It follows a named Docker training container, checkpoint files, TensorBoard scalars, host resource use, and NVIDIA telemetry without being able to start, stop, or alter a run.
+
 ### Do We Need To Train PPO?
 
 Yes. The short smoke model only verifies that PPO, LLVM, observations, rewards, checkpointing, and evaluation connect correctly. It is not a research result. A defensible result requires training on the training split with multiple seeds, selecting a checkpoint using validation programs only, and evaluating that locked checkpoint once on unseen test programs. The current pilot commands exercise this protocol with a tiny timestep budget; final training must use a substantially larger predeclared budget.
@@ -385,6 +387,21 @@ The repository must provide:
 - a final evaluation command;
 - a reproduction script for the reported experiments.
 
+## Training Workstation Profile
+
+The current development machine is an AMD Ryzen 7 7435HS (8 cores / 16
+threads), 24 GiB RAM, and an NVIDIA GeForce RTX 4060 Laptop GPU with 8 GiB
+VRAM. This is enough for the current PPO experiments, but LLVM subprocesses
+and feature extraction are the practical bottleneck—not the small MLP policy.
+
+The recommended default is one seed at a time with `--device cpu`; it leaves
+memory headroom for LLVM and avoids GPU transfer overhead for this small model.
+Use `--device cuda` only as a recorded comparison after confirming CUDA is
+available in the container. Do not launch all five seeds concurrently on this
+machine: run them sequentially and preserve the complete artifact directory
+for every seed. See [train.md](train.md) for hardware-aware commands and the
+monitoring workflow.
+
 ## Repository Structure
 
 The implementation will use a src layout:
@@ -433,6 +450,10 @@ The implementation will use a src layout:
 ├── scripts/
 │   ├── smoke_test.sh
 │   └── reproduce_smoke.sh
+│
+├── monitoring/
+│   ├── server.py
+│   └── README.md
 │
 ├── results/
 │   ├── raw/

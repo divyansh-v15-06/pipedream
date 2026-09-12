@@ -41,6 +41,9 @@ Completed and verified:
   per-seed metadata/configuration, and training-only normalization statistics are
   versioned with the repository. The run completed, but its validation
   selection and held-out test evaluation are still the next actions.
+- A local read-only dashboard in `monitoring/` can follow a Docker training
+  container, TensorBoard event files, checkpoints, host resources, and NVIDIA
+  telemetry. It is support tooling only; it cannot control a training run.
 
 Open research boundaries:
 
@@ -104,6 +107,7 @@ packages require the analysis extra.
 2. `TODO.md` for chunk gates and current evidence.
 3. `train.md` for the experiment protocol.
 4. The relevant module tests before changing a behavior.
+5. `monitoring/README.md` when observing a long local training run.
 
 Keep the public command-line interfaces stable when possible. Add a focused
 test for behavior changes, and prefer extending the existing result metadata

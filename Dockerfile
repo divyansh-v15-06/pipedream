@@ -28,6 +28,10 @@ RUN curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key \
         clang-$LLVM_MAJOR \
         llvm-$LLVM_MAJOR \
         llvm-$LLVM_MAJOR-tools \
+    && ln -s /usr/bin/clang-$LLVM_MAJOR /usr/local/bin/clang \
+    && ln -s /usr/bin/opt-$LLVM_MAJOR /usr/local/bin/opt \
+    && ln -s /usr/bin/llvm-as-$LLVM_MAJOR /usr/local/bin/llvm-as \
+    && ln -s /usr/bin/llvm-dis-$LLVM_MAJOR /usr/local/bin/llvm-dis \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python -m pip install --no-cache-dir uv
