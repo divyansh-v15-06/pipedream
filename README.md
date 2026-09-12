@@ -470,6 +470,7 @@ The implementation will use a src layout:
 │
 ├── context.md
 ├── train.md
+├── FRIEND_AGENT_PROMPT.md
 ├── remaining_work.md
 └── TODO.md
 ~~~
