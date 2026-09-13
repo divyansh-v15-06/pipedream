@@ -16,5 +16,6 @@ results/tables/*
 benchmarks/data/
 *.bc
 *.ll
+!tests/fixtures/*.ll
 *.o
 *.out
