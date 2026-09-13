@@ -38,9 +38,11 @@ Completed and verified:
   are implemented.
 - Five development-pilot seeds were trained for 100,000 PPO timesteps each
   (500,000 total) in `results/raw/overnight_pilot/ppo`. The five checkpoints,
-  per-seed metadata/configuration, and training-only normalization statistics are
-  versioned with the repository. The run completed, but its validation
-  selection and held-out test evaluation are still the next actions.
+  per-seed metadata/configuration, training-only normalization statistics,
+  validation checkpoint selection (`selection.json` selecting `seed_0`),
+  held-out test evaluation (`test.jsonl`), full baseline comparisons
+  (`baselines_test.jsonl`), and paired bootstrap statistics
+  (`paired_analysis_*.json`) are recorded and versioned with the repository.
 - A local read-only dashboard in `monitoring/` can follow a Docker training
   container, TensorBoard event files, checkpoints, host resources, and NVIDIA
   telemetry. It is support tooling only; it cannot control a training run.

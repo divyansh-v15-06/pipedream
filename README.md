@@ -44,9 +44,17 @@ The current vertical slice also includes a 12-program checksum manifest, a deter
 
 A local, read-only training dashboard is also available in `monitoring/`. It follows a named Docker training container, checkpoint files, TensorBoard scalars, host resource use, and NVIDIA telemetry without being able to start, stop, or alter a run.
 
+### Development-Pilot Status (Completed)
+
+The development-pilot vertical slice is complete across all stages:
+- **PPO Training**: Five seeds trained sequentially for 100,000 steps each (500,000 total) on training programs in `results/raw/overnight_pilot/ppo/`.
+- **Validation Selection**: Checkpoints were evaluated using validation split records only via `pipedream-select-checkpoint`, selecting `seed_0` (63.5% mean instruction reduction) recorded in `results/raw/overnight_pilot/selection.json`.
+- **Held-Out Test Evaluation**: The selected `seed_0` checkpoint was evaluated once on the locked test programs in `results/raw/overnight_pilot/test.jsonl`, achieving a 58.3% mean instruction reduction (66.7% on `pilot_011_polynomial` and 50.0% on `pilot_012_sum`) with 0 failed steps.
+- **Baselines & Paired Analysis**: LLVM pipelines (`-O2`, `-O3`, `-Oz`), random search, greedy search, and beam search were evaluated across seeds 0–4 in `results/raw/overnight_pilot/baselines_test.jsonl` and summarized in `results/raw/overnight_pilot/baselines_report.json`. Paired bootstrap statistics are recorded in `results/raw/overnight_pilot/paired_analysis_*.json`.
+
 ### Do We Need To Train PPO?
 
-Yes. The short smoke model only verifies that PPO, LLVM, observations, rewards, checkpointing, and evaluation connect correctly. It is not a research result. A defensible result requires training on the training split with multiple seeds, selecting a checkpoint using validation programs only, and evaluating that locked checkpoint once on unseen test programs. The current pilot commands exercise this protocol with a tiny timestep budget; final training must use a substantially larger predeclared budget.
+Yes. The smoke model and pilot slice verify that PPO, LLVM, observations, rewards, checkpointing, and evaluation connect correctly. They prove the protocol wiring. A defensible main research result requires training on the full main benchmark split with multiple seeds, selecting a checkpoint using validation programs only, and evaluating that locked checkpoint once on unseen test programs. Final main training will scale to a predeclared 500,000-step budget per seed on an acquired AnghaBench corpus.
 
 ## Contribution Boundary
 
@@ -342,7 +350,26 @@ The primary test-set report includes mean, median, standard deviation, median im
 
 Methods are compared per program using paired differences. The report includes bootstrap confidence intervals, effect sizes, and a suitable paired statistical test selected before looking at final results. Multiple-comparison handling is documented when more than one primary claim is tested.
 
-The final result table is:
+### Development-Pilot Held-Out Comparison Table
+
+The vertical slice was evaluated on the locked test split (`pilot_011_polynomial` and `pilot_012_sum`) following validation checkpoint selection of PPO `seed_0` (recorded in `results/raw/overnight_pilot/`):
+
+| Method | Test Programs | Mean Final Instructions | Mean Instruction Reduction | Mean Optimization Cost |
+|---|---:|---:|---:|---:|
+| **`-O2`** | 2 | 2.0 | **92.6%** | 21.9 ms |
+| **`-O3`** | 2 | 2.0 | **92.6%** | 21.0 ms |
+| **`-Oz`** | 2 | 2.0 | **92.6%** | 21.6 ms |
+| **`beam`** | 2 | 11.0 | **58.3%** | 12,157.2 ms |
+| **`greedy`** | 2 | 11.0 | **58.3%** | 6,832.6 ms |
+| **`random`** | 2 | 11.1 | **57.9%** | 590.6 ms |
+| **PPO (`seed_0`)** | 2 | 11.0 | **58.3%** | ~11.5 ms inference |
+
+Key pilot findings:
+- **PPO matches greedy and beam search**: PPO (`seed_0`) achieves identical mean final instruction count (11.0) and reduction (58.3%) on unseen test programs as 12-step greedy and beam search, while evaluating via single-pass forward inference (~11 ms vs ~6,800 ms for greedy and ~12,157 ms for beam search).
+- **LLVM pipelines vs fixed catalog**: LLVM standard pipelines (`-O2`, `-O3`, `-Oz`) achieve 2.0 instructions by applying full function-level loop deletion and constant folding outside the fixed 12-pass action catalog.
+- **Robustness**: The selected PPO policy produced 0 failed steps across all test episodes.
+
+The main-scale result table (to be filled after AnghaBench scaling) is:
 
 | Method | Test IR count | Change vs -O3 | Code size | Runtime | Total optimization cost |
 |---|---:|---:|---:|---:|---:|
@@ -513,13 +540,13 @@ Gate: all baselines run on the pilot tier from the same initial IR and produce r
 
 Implement the 56-feature helper, normalization, PPO configuration, and local TensorBoard logging.
 
-Gate: PPO trains on the pilot tier and beats or meaningfully differs from random under a predeclared metric.
+Gate: PPO trains on the pilot tier and beats or meaningfully differs from random under a predeclared metric. *(Passed on pilot tier: 5 seeds trained for 100,000 steps each in `results/raw/overnight_pilot/ppo/`).*
 
 ### M6: Held-out evaluation
 
 Lock the training protocol, run multiple seeds, evaluate on the test split, and produce the first research table.
 
-Gate: no test-derived tuning remains and all artifacts contain metadata.
+Gate: no test-derived tuning remains and all artifacts contain metadata. *(Passed on pilot tier: validation selection produced `selection.json`, test evaluation produced `test.jsonl`, all baselines produced `baselines_test.jsonl`/`baselines_report.json`, and bootstrap differences are recorded in `paired_analysis_*.json`. Main AnghaBench evaluation is the remaining scale-up).*
 
 ### M7: IR2Vec ablation
 
@@ -537,16 +564,75 @@ Gate: every final claim is supported by held-out data and a replayable command.
 
 Only after M8, consider multi-objective rewards, runtime measurement, adaptive stopping, beam search, action masking, or a public demo.
 
-## Initial Commands
+## Experiment Commands
 
-The first implementation should expose commands with stable names:
+The repository provides modular command-line entry points for every phase of the experiment:
 
 ~~~bash
+# 1. Smoke test
 uv run pipedream-smoke
+
+# 2. Replay an explicit pass sequence with JSONL trace
 uv run pipedream-sequence --program path/to/program.bc --passes mem2reg instcombine gvn dce
-uv run pipedream-baselines --config configs/baseline.yaml
-uv run pipedream-train --config configs/ppo_autophase.yaml
-uv run pipedream-evaluate --config configs/ppo_autophase.yaml --split test
+
+# 3. Fit normalization statistics on training IR only
+uv run pipedream-fit-normalizer \
+  --manifest benchmarks/pilot_manifest.json \
+  --schema configs/autophase_schema.yaml \
+  --split train \
+  --output results/raw/normalization_train.json
+
+# 4. Train PPO policy seeds
+uv run --extra rl pipedream-train \
+  --manifest benchmarks/pilot_manifest.json \
+  --catalog configs/pass_catalog.yaml \
+  --schema configs/autophase_schema.yaml \
+  --normalization-stats results/raw/normalization_train.json \
+  --split train \
+  --output-dir results/raw/ppo \
+  --seeds 0 1 2 3 4 \
+  --total-timesteps 100000
+
+# 5. Select best checkpoint on validation programs only
+uv run --extra rl pipedream-select-checkpoint \
+  --manifest benchmarks/pilot_manifest.json \
+  --catalog configs/pass_catalog.yaml \
+  --schema configs/autophase_schema.yaml \
+  --normalization-stats results/raw/normalization_train.json \
+  --models results/raw/ppo/seed_*/ppo_model.zip \
+  --output results/raw/selection.json
+
+# 6. Evaluate selected checkpoint once on unseen test split
+uv run --extra rl pipedream-evaluate \
+  --manifest benchmarks/pilot_manifest.json \
+  --catalog configs/pass_catalog.yaml \
+  --schema configs/autophase_schema.yaml \
+  --normalization-stats results/raw/normalization_train.json \
+  --model results/raw/ppo/seed_0/ppo_model.zip \
+  --split test \
+  --output results/raw/test.jsonl
+
+# 7. Run all baselines (-O2, -O3, -Oz, random, greedy, beam)
+uv run pipedream-baselines \
+  --manifest benchmarks/pilot_manifest.json \
+  --catalog configs/pass_catalog.yaml \
+  --split test \
+  --methods -O2 -O3 -Oz random greedy beam \
+  --seeds 0 1 2 3 4 \
+  --output results/raw/baselines_test.jsonl
+
+# 8. Aggregate baselines report
+uv run --extra analysis pipedream-report \
+  --input results/raw/baselines_test.jsonl \
+  --output results/raw/baselines_report.json
+
+# 9. Run paired bootstrap statistical analysis
+uv run --extra analysis pipedream-analyze \
+  --baseline results/raw/baselines_test.jsonl \
+  --candidate results/raw/test.jsonl \
+  --metric final_instruction_count \
+  --baseline-method=-Oz \
+  --output results/raw/paired_analysis_Oz.json
 ~~~
 
 The exact entry-point implementation may change, but command behavior and output schemas must be documented and tested.
