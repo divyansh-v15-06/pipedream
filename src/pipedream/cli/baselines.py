@@ -16,8 +16,30 @@ ALL_METHODS = (*DEFAULT_METHODS, "beam")
 
 
 def main(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    normalized_argv: list[str] = []
+    in_methods = False
+    for arg in argv:
+        if arg == "--methods":
+            in_methods = True
+            continue
+        if in_methods:
+            if arg.startswith("--"):
+                in_methods = False
+                normalized_argv.append(arg)
+            else:
+                normalized_argv.append(f"--methods={arg}")
+        else:
+            normalized_argv.append(arg)
+
     parser = _build_parser()
-    args = parser.parse_args(argv)
+    args = parser.parse_args(normalized_argv)
+    if "all" in args.methods:
+        resolved_methods = (*DEFAULT_METHODS, "beam")
+    else:
+        resolved_methods = tuple(args.methods)
+
     manifest = load_manifest(args.manifest)
     catalog = PassCatalog.from_yaml(args.catalog)
     records = [record for record in manifest.records if args.split in {record.split, "all"}]
@@ -36,7 +58,7 @@ def main(argv: list[str] | None = None) -> int:
                     args.manifest.parent,
                     catalog,
                     engine,
-                    methods=tuple(args.methods),
+                    methods=resolved_methods,
                     seed=seed,
                     max_steps=args.max_steps,
                     clang=args.clang,
@@ -54,7 +76,13 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--catalog", type=Path, required=True)
     parser.add_argument("--split", default="smoke")
     parser.add_argument("--limit", type=int)
-    parser.add_argument("--methods", nargs="+", choices=ALL_METHODS, default=DEFAULT_METHODS)
+    parser.add_argument(
+        "--methods",
+        nargs="+",
+        action="extend",
+        choices=(*ALL_METHODS, "all"),
+        default=list(DEFAULT_METHODS),
+    )
     parser.add_argument("--seeds", nargs="+", type=int, default=[0])
     parser.add_argument("--max-steps", type=int, default=12)
     parser.add_argument("--beam-width", type=int, default=2)
