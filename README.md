@@ -390,6 +390,33 @@ Populated with empirical results from the held-out test evaluation (`results/raw
 - **IR2Vec variants**: The representation ablation study is architected in `src/pipedream/representation/ir2vec.py` and deferred to Chunk 8 pending upstream IR2Vec embedding binaries.
 - **Artifacts**: Summary tables are archived in `results/tables/comparison_table.csv` and `results/tables/comparison_table.md`. Publication figures are saved in `results/figures/` (`instruction_reduction.png`, `optimization_cost.png`, and `bootstrap_differences.png`).
 
+### Pass Transitions, Repeated Motifs, and Program Adaptation
+
+Inspecting the locked test-set traces (`results/raw/overnight_pilot/test.jsonl`) reveals distinct learned optimization patterns:
+- **`pilot_011_polynomial` (arithmetic/alloca intensive)**:
+  Sequence: `["sroa", "instcombine", "instcombine", ...]` (8 final instructions, 66.7% reduction).
+  *Analysis*: The policy immediately identifies local scalar structures and applies `sroa` (scalar replacement of aggregates) to unpack memory allocas into virtual registers. Once in SSA register form, consecutive `instcombine` passes simplify algebraic expressions and fold constants.
+- **`pilot_012_sum` (loop/control-flow intensive)**:
+  Sequence: `["mem2reg", "simplifycfg", "simplifycfg", ...]` (14 final instructions, 50.0% reduction).
+  *Analysis*: For the loop with an accumulator, the policy selects `mem2reg` to elevate stack variables to SSA $\phi$-nodes, followed by `simplifycfg` to collapse redundant basic blocks and dead branch edges.
+- **Comparison to Search Baselines**: Random search frequently inserts ineffective or premature passes (e.g., `reassociate` or `licm` before alloca promotion), leading to high variance (57.9% ± 1.8%). PPO converges on the same effective initial transformations as 12-step greedy and beam search without incurring their multi-second evaluation overhead.
+
+### Seed Disagreement and Convergence
+
+Validation split evaluations across five training seeds (`results/raw/overnight_pilot/selection.json`):
+- `seed_0`: 63.5% mean reduction (selected checkpoint)
+- `seed_1`: 44.5% mean reduction
+- `seed_2`: 48.5% mean reduction
+- `seed_3`: 30.5% mean reduction
+- `seed_4`: 33.5% mean reduction
+- **Summary**: Mean across seeds is 44.1% ± 13.0%. Convergence is sensitive to initial policy weights and early exploration: runs discovering early memory promotion (`sroa`/`mem2reg`) consistently reach >45% reduction, while lagging runs settle into local optima with delayed promotion.
+
+### Threats to Validity and Limitations
+
+1. **Catalog Scope vs. Full LLVM Pipelines**: Standard `-O2`/`-O3` achieve 2.0 instructions by using whole-pipeline loop unrolling, complete loop deletion, and inter-procedural passes that lie outside our fixed 12-pass intra-procedural catalog.
+2. **Benchmark Scale**: The development pilot operates on a 12-program verified manifest. While train/val/test splits strictly isolate program families, evaluating on thousands of AnghaBench functions remains necessary for broader claims of domain generality.
+3. **Primary Metric Proxy**: Instruction count reduction is a stable, deterministic compile-time metric, but does not guarantee proportional machine-code size reduction or CPU cycle improvement on diverse microarchitectures.
+
 No result is reported from a cherry-picked benchmark. Per-program distributions and failures remain available in raw artifacts.
 
 ## Reproducibility Contract

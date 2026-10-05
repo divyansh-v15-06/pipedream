@@ -135,10 +135,10 @@ Gate: the ablation answers whether IR2Vec changes quality, generalization, or co
 
 - [x] Add paired bootstrap confidence intervals.
 - [x] Add effect sizes and predeclared paired tests.
-- [ ] Analyze pass transitions and repeated motifs.
+- [x] Analyze pass transitions and repeated motifs.
 - [x] Analyze program-adaptive behavior.
-- [ ] Compare seed disagreement.
-- [ ] Write limitations and threats to validity.
+- [x] Compare seed disagreement.
+- [x] Write limitations and threats to validity.
 - [x] Add the smoke/pilot reproduction script.
 
 Gate: every final claim is supported by held-out data and a replayable command.
