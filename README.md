@@ -40,7 +40,7 @@ The repository has completed the toolchain baseline and deterministic pass engin
 - a sequence replay CLI that writes final bitcode, a JSONL trace, and a summary artifact; and
 - a container smoke test that compiles, optimizes, verifies, disassembles, and reassembles LLVM bitcode.
 
-The current vertical slice also includes a 12-program checksum manifest, a deterministic Gymnasium environment, LLVM pipeline/random/greedy/beam baselines, a project-owned 56-feature representation, training-only normalization, PPO smoke and development-pilot training, deterministic held-out evaluation, and paired analysis utilities. Research-scale AnghaBench acquisition, main-scale training, final figures, and the empirical IR2Vec comparison remain open. IR2Vec is intentionally validated in the later representation-study milestone rather than treated as a M0 dependency.
+The current vertical slice also includes a 12-program checksum manifest, a deterministic Gymnasium environment, LLVM pipeline/random/greedy/beam baselines, a project-owned 56-feature representation, training-only normalization, PPO smoke and development-pilot training, deterministic held-out evaluation, paired bootstrap analysis, and publication figures/tables in `results/figures/` and `results/tables/`. Large-scale AnghaBench acquisition and empirical IR2Vec comparisons remain open as follow-on milestones. IR2Vec is intentionally validated in the later representation-study milestone rather than treated as a M0 dependency.
 
 A local, read-only training dashboard is also available in `monitoring/`. It follows a named Docker training container, checkpoint files, TensorBoard scalars, host resource use, and NVIDIA telemetry without being able to start, stop, or alter a run.
 
@@ -390,6 +390,22 @@ Populated with empirical results from the held-out test evaluation (`results/raw
 - **IR2Vec variants**: The representation ablation study is architected in `src/pipedream/representation/ir2vec.py` and deferred to Chunk 8 pending upstream IR2Vec embedding binaries.
 - **Artifacts**: Summary tables are archived in `results/tables/comparison_table.csv` and `results/tables/comparison_table.md`. Publication figures are saved in `results/figures/` (`instruction_reduction.png`, `optimization_cost.png`, and `bootstrap_differences.png`).
 
+### Publication Figures
+
+The empirical results are visualized in three publication figures:
+
+#### Figure 1: Mean Instruction Reduction Across Methods
+![Instruction Reduction](results/figures/instruction_reduction.png)
+*Mean non-debug LLVM IR instruction count reduction on held-out test programs. PPO matches Greedy and Beam search within the 12-pass action catalog.*
+
+#### Figure 2: Optimization Quality vs. Latency Trade-Off
+![Optimization Cost Tradeoff](results/figures/optimization_cost.png)
+*Pareto frontier of optimization time vs. reduction quality. PPO achieves single-pass forward inference (~11.5 ms), matching greedy and beam search at ~600x to 1,000x lower latency.*
+
+#### Figure 3: Paired Bootstrap Confidence Intervals (95% CI)
+![Bootstrap Difference Intervals](results/figures/bootstrap_differences.png)
+*95% bootstrap confidence intervals for paired differences in final instruction count between PPO and each baseline.*
+
 ### Pass Transitions, Repeated Motifs, and Program Adaptation
 
 Inspecting the locked test-set traces (`results/raw/overnight_pilot/test.jsonl`) reveals distinct learned optimization patterns:
@@ -668,6 +684,12 @@ uv run --extra analysis pipedream-analyze \
   --metric final_instruction_count \
   --baseline-method=-Oz \
   --output results/raw/paired_analysis_Oz.json
+
+# 10. Generate publication tables and figures
+uv run --extra analysis pipedream-visualize \
+  --results-dir results/raw/overnight_pilot \
+  --output-tables-dir results/tables \
+  --output-figures-dir results/figures
 ~~~
 
 The exact entry-point implementation may change, but command behavior and output schemas must be documented and tested.
