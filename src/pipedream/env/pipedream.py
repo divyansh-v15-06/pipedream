@@ -51,7 +51,9 @@ class PipedreamEnv(gym.Env[NDArray[np.float32], int]):
             raise ValueError("normalization statistics do not match the feature schema")
         self.action_space = gym.spaces.Discrete(len(catalog.passes))
         feature_low = (
-            np.zeros(56, dtype=np.float32) if extractor is not None else np.empty(0, dtype=np.float32)
+            np.zeros(56, dtype=np.float32)
+            if extractor is not None
+            else np.empty(0, dtype=np.float32)
         )
         feature_high = (
             np.full(
@@ -124,9 +126,7 @@ class PipedreamEnv(gym.Env[NDArray[np.float32], int]):
         self._refresh_features()
         return self._observation(), self._reset_info()
 
-    def step(
-        self, action: int
-    ) -> tuple[NDArray[np.float32], float, bool, bool, dict[str, object]]:
+    def step(self, action: int) -> tuple[NDArray[np.float32], float, bool, bool, dict[str, object]]:
         if self._record is None:
             raise RuntimeError("reset must be called before step")
         action_id = int(action)

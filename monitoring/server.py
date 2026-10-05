@@ -18,9 +18,7 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 STATIC_ROOT = Path(__file__).resolve().parent
 CONTAINER = os.environ.get("PIPEDREAM_CONTAINER", "pipedream-overnight")
-OUTPUT_DIR = ROOT / os.environ.get(
-    "PIPEDREAM_OUTPUT_DIR", "results/raw/overnight_pilot/ppo"
-)
+OUTPUT_DIR = ROOT / os.environ.get("PIPEDREAM_OUTPUT_DIR", "results/raw/overnight_pilot/ppo")
 TOTAL_TIMESTEPS = int(os.environ.get("PIPEDREAM_TOTAL_TIMESTEPS", "100000"))
 
 
@@ -62,8 +60,17 @@ def parse_size(value: str) -> float:
         return 0.0
     number = float(match.group(1))
     unit = (match.group(2) or "B").upper()
-    multipliers = {"B": 1, "KB": 1000, "KIB": 1024, "MB": 1000**2, "MIB": 1024**2,
-                   "GB": 1000**3, "GIB": 1024**3, "TB": 1000**4, "TIB": 1024**4}
+    multipliers = {
+        "B": 1,
+        "KB": 1000,
+        "KIB": 1024,
+        "MB": 1000**2,
+        "MIB": 1024**2,
+        "GB": 1000**3,
+        "GIB": 1024**3,
+        "TB": 1000**4,
+        "TIB": 1024**4,
+    }
     return number * multipliers.get(unit, 1)
 
 
@@ -130,7 +137,7 @@ def tensorboard_progress() -> list[dict[str, Any]]:
     # Keep this derived from the monitor's configured output directory so a
     # dashboard can follow a named experiment other than the overnight pilot.
     container_output_dir = Path("/workspace") / OUTPUT_DIR.relative_to(ROOT)
-    script = r'''
+    script = r"""
 import json
 from pathlib import Path
 from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
@@ -166,7 +173,7 @@ for seed_dir in sorted(root.glob("seed_*")):
             row["error"] = str(exc)
     rows.append(row)
 print(json.dumps(rows))
-'''.replace("__OUTPUT_DIR__", repr(str(container_output_dir)))
+""".replace("__OUTPUT_DIR__", repr(str(container_output_dir)))
     try:
         result = command(
             ["docker", "exec", CONTAINER, "/workspace/.venv/bin/python", "-c", script],
@@ -220,25 +227,36 @@ def get_status() -> dict[str, Any]:
     started = parse_timestamp(state.get("StartedAt"))
     progress = tensorboard_progress() if inspected else []
     seed_dirs = sorted(OUTPUT_DIR.glob("seed_*"))
-    known_seeds = {int(path.name.removeprefix("seed_")) for path in seed_dirs if path.name.removeprefix("seed_").isdigit()}
+    known_seeds = {
+        int(path.name.removeprefix("seed_"))
+        for path in seed_dirs
+        if path.name.removeprefix("seed_").isdigit()
+    }
     known_seeds.update(int(row["seed"]) for row in progress)
     if not known_seeds:
         known_seeds = set(range(5))
     by_seed = {int(row["seed"]): row for row in progress}
     seeds = []
     for seed in sorted(known_seeds):
-        row = by_seed.get(seed, {"seed": seed, "step": 0, "fps": 0.0, "reward": None, "episodeLength": None})
-        model_exists = bool(row.get("modelExists")) or (OUTPUT_DIR / f"seed_{seed}" / "ppo_model.zip").is_file()
+        row = by_seed.get(
+            seed, {"seed": seed, "step": 0, "fps": 0.0, "reward": None, "episodeLength": None}
+        )
+        model_exists = (
+            bool(row.get("modelExists"))
+            or (OUTPUT_DIR / f"seed_{seed}" / "ppo_model.zip").is_file()
+        )
         step = min(TOTAL_TIMESTEPS, int(row.get("step", 0)))
-        seeds.append({
-            **row,
-            "seed": seed,
-            "step": step,
-            "totalTimesteps": TOTAL_TIMESTEPS,
-            "progressPercent": round(step * 100 / TOTAL_TIMESTEPS, 2),
-            "status": "completed" if model_exists else "training" if step else "queued",
-            "modelExists": model_exists,
-        })
+        seeds.append(
+            {
+                **row,
+                "seed": seed,
+                "step": step,
+                "totalTimesteps": TOTAL_TIMESTEPS,
+                "progressPercent": round(step * 100 / TOTAL_TIMESTEPS, 2),
+                "status": "completed" if model_exists else "training" if step else "queued",
+                "modelExists": model_exists,
+            }
+        )
     completed = sum(seed["status"] == "completed" for seed in seeds)
     current = next((seed for seed in seeds if seed["status"] == "training"), None)
     fps = float(current.get("fps", 0)) if current else 0.0

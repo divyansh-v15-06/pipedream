@@ -17,13 +17,17 @@ def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
     full_manifest = load_manifest(args.manifest)
-    records = tuple(record for record in full_manifest.records if args.split in {record.split, "all"})
+    records = tuple(
+        record for record in full_manifest.records if args.split in {record.split, "all"}
+    )
     if not records:
         parser.error(f"manifest has no records for split {args.split!r}")
     manifest = BenchmarkManifest(full_manifest.schema_version, full_manifest.tier, records)
     catalog = PassCatalog.from_yaml(args.catalog)
     schema = FeatureSchema.from_yaml(args.schema)
-    normalizer = NormalizationStats.load(args.normalization_stats) if args.normalization_stats else None
+    normalizer = (
+        NormalizationStats.load(args.normalization_stats) if args.normalization_stats else None
+    )
     env = PipedreamEnv(
         manifest,
         args.manifest.parent,

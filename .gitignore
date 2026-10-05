@@ -10,7 +10,10 @@ __pycache__/
 results/raw/*
 results/processed/*
 results/figures/*
+!results/figures/*.png
 results/tables/*
+!results/tables/*.csv
+!results/tables/*.md
 !results/**/.gitkeep
 
 benchmarks/data/

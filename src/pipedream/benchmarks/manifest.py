@@ -115,7 +115,9 @@ def build_manifest(
     manifest = BenchmarkManifest("pipedream-manifest-v1", tier, tuple(records))
     manifest.validate(output.parent)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(_to_json(manifest), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps(_to_json(manifest), indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     return manifest
 
 
@@ -134,14 +136,24 @@ def split_manifest(
     groups: dict[str, list[BenchmarkRecord]] = {}
     for record in manifest.records:
         groups.setdefault(record.source_family, []).append(record)
-    ordered = [record for family in sorted(groups) for record in sorted(groups[family], key=lambda x: x.source)]
+    ordered = [
+        record
+        for family in sorted(groups)
+        for record in sorted(groups[family], key=lambda x: x.source)
+    ]
     train_count = max(1, round(len(ordered) * train_fraction))
     validation_count = max(1, round(len(ordered) * validation_fraction))
     if train_count + validation_count >= len(ordered):
         validation_count = max(1, len(ordered) - train_count - 1)
     split_records: list[BenchmarkRecord] = []
     for index, record in enumerate(ordered):
-        split = "train" if index < train_count else "validation" if index < train_count + validation_count else "test"
+        split = (
+            "train"
+            if index < train_count
+            else "validation"
+            if index < train_count + validation_count
+            else "test"
+        )
         split_records.append(
             BenchmarkRecord(
                 benchmark_id=f"{tier}_{index + 1:03d}_{Path(record.source).stem}",
@@ -160,7 +172,9 @@ def split_manifest(
     result = BenchmarkManifest("pipedream-manifest-v1", tier, tuple(split_records))
     result.validate(source_root or output.parent)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(_to_json(result), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps(_to_json(result), indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     return result
 
 
@@ -199,7 +213,9 @@ def compile_source(
             text=True,
         )
         if completed.returncode != 0 or not output.is_file():
-            raise RuntimeError(completed.stderr.strip() or f"clang exited with {completed.returncode}")
+            raise RuntimeError(
+                completed.stderr.strip() or f"clang exited with {completed.returncode}"
+            )
         return output.read_bytes()
 
 

@@ -239,8 +239,7 @@ def trace_record(
             "before_instruction_count": before_count,
             "instruction_count": after_count,
             "after_instruction_count": after_count,
-            "reward": (before_count - result.instruction_count)
-            / max(before_count, 1)
+            "reward": (before_count - result.instruction_count) / max(before_count, 1)
             if result.committed
             else 0.0,
             "action_id": action_id,

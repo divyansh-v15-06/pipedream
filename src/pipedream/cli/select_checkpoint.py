@@ -23,7 +23,9 @@ def main(argv: list[str] | None = None) -> int:
     manifest = BenchmarkManifest(full_manifest.schema_version, full_manifest.tier, records)
     catalog = PassCatalog.from_yaml(args.catalog)
     schema = FeatureSchema.from_yaml(args.schema)
-    normalizer = NormalizationStats.load(args.normalization_stats) if args.normalization_stats else None
+    normalizer = (
+        NormalizationStats.load(args.normalization_stats) if args.normalization_stats else None
+    )
     env = PipedreamEnv(
         manifest,
         args.manifest.parent,

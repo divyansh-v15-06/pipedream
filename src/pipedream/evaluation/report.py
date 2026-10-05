@@ -9,7 +9,9 @@ from statistics import mean, median, stdev
 
 
 def build_report(input_path: Path, output_path: Path) -> list[dict[str, object]]:
-    rows = [json.loads(line) for line in input_path.read_text(encoding="utf-8").splitlines() if line]
+    rows = [
+        json.loads(line) for line in input_path.read_text(encoding="utf-8").splitlines() if line
+    ]
     grouped: dict[str, list[dict[str, object]]] = defaultdict(list)
     for row in rows:
         grouped[str(row["method"])].append(row)

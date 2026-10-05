@@ -60,9 +60,7 @@ def evaluate_record(
     results: list[BaselineResult] = []
     for method in methods:
         if method in PIPELINES:
-            final_ir, duration_ms = _run_pipeline(
-                initial_ir, PIPELINES[method], engine.config
-            )
+            final_ir, duration_ms = _run_pipeline(initial_ir, PIPELINES[method], engine.config)
             final_count = engine.instruction_count(final_ir)
             sequence: tuple[str, ...] = ()
             llvm_time_ms = duration_ms
@@ -122,7 +120,9 @@ def _run_pipeline(ir: bytes, pipeline: str, config: CompilerConfig) -> tuple[byt
         )
         duration_ms = (time.perf_counter() - started) * 1000
         if completed.returncode != 0 or not output_path.is_file():
-            raise RuntimeError(completed.stderr.strip() or f"opt exited with {completed.returncode}")
+            raise RuntimeError(
+                completed.stderr.strip() or f"opt exited with {completed.returncode}"
+            )
         return output_path.read_bytes(), duration_ms
 
 

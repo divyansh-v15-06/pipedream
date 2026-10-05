@@ -31,7 +31,7 @@ Gate: a clean environment can compile a smoke program, apply an explicit pass se
 - [x] Implement non-debug instruction counting.
 - [x] Implement JSONL step traces.
 - [x] Implement content-addressed pass-result caching.
-- [~] Add unit tests for success, no-op, failure, timeout, and rollback.
+- [x] Add unit tests for success, no-op, failure, timeout, and rollback.
 - [x] Add a sequence replay CLI.
 
 Current slice: `src/pipedream/compiler/catalog.py`,
@@ -110,7 +110,7 @@ Gate: PPO trains end to end and produces a result different from random under th
 - [x] Evaluate once on the development pilot test split.
 - [x] Verify the evaluation CLI on the smoke split.
 - [x] Produce per-program raw artifacts.
-- [ ] Produce the first comparison table and figures.
+- [x] Produce the first comparison table and figures.
 - [x] Produce a smoke comparison table.
 - [x] Record failures instead of dropping them silently.
 
@@ -134,9 +134,9 @@ Gate: the ablation answers whether IR2Vec changes quality, generalization, or co
 ## Chunk 9: Research analysis
 
 - [x] Add paired bootstrap confidence intervals.
-- [~] Add effect sizes and predeclared paired tests.
+- [x] Add effect sizes and predeclared paired tests.
 - [ ] Analyze pass transitions and repeated motifs.
-- [ ] Analyze program-adaptive behavior.
+- [x] Analyze program-adaptive behavior.
 - [ ] Compare seed disagreement.
 - [ ] Write limitations and threats to validity.
 - [x] Add the smoke/pilot reproduction script.

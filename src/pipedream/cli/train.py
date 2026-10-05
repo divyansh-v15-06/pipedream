@@ -19,7 +19,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     full_manifest = load_manifest(args.manifest)
     records = tuple(
-        record for record in full_manifest.records if args.split == "all" or record.split == args.split
+        record
+        for record in full_manifest.records
+        if args.split == "all" or record.split == args.split
     )
     if not records:
         parser.error(f"manifest has no records for split {args.split!r}")
@@ -27,7 +29,9 @@ def main(argv: list[str] | None = None) -> int:
     catalog = PassCatalog.from_yaml(args.catalog)
     schema = FeatureSchema.from_yaml(args.schema)
     extractor = AutophaseExtractor(schema)
-    normalizer = NormalizationStats.load(args.normalization_stats) if args.normalization_stats else None
+    normalizer = (
+        NormalizationStats.load(args.normalization_stats) if args.normalization_stats else None
+    )
     env = PipedreamEnv(
         manifest,
         args.manifest.parent,

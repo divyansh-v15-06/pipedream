@@ -69,7 +69,9 @@ class IR2VecExtractor:
         if completed.returncode != 0:
             raise RuntimeError(completed.stderr.strip() or "IR2Vec command failed")
         try:
-            values = np.asarray([float(token) for token in completed.stdout.split()], dtype=np.float32)
+            values = np.asarray(
+                [float(token) for token in completed.stdout.split()], dtype=np.float32
+            )
         except ValueError as exc:
             raise RuntimeError("IR2Vec output must be whitespace-separated floats") from exc
         if values.shape != (self.config.dimension,):

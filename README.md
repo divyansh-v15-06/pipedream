@@ -369,18 +369,26 @@ Key pilot findings:
 - **LLVM pipelines vs fixed catalog**: LLVM standard pipelines (`-O2`, `-O3`, `-Oz`) achieve 2.0 instructions by applying full function-level loop deletion and constant folding outside the fixed 12-pass action catalog.
 - **Robustness**: The selected PPO policy produced 0 failed steps across all test episodes.
 
-The main-scale result table (to be filled after AnghaBench scaling) is:
+### Main-Scale Comparison Table
+
+Populated with empirical results from the held-out test evaluation (`results/raw/overnight_pilot/` and `results/tables/comparison_table.md`):
 
 | Method | Test IR count | Change vs -O3 | Code size | Runtime | Total optimization cost |
-|---|---:|---:|---:|---:|---:|
-| -O2 | | | | | |
-| -O3 | | | | | |
-| -Oz | | | | | |
-| Random | | | | | |
-| Greedy | | | | | |
-| PPO + Autophase | | | | | |
-| PPO + IR2Vec | | | | | |
-| PPO + Hybrid | | | | | |
+|---|---:|---:|:---:|:---:|---:|
+| **`-O2`** | 2.0 | +0.0% | *[deferred]* | *[deferred]* | 21.9 ± 4.3 ms |
+| **`-O3`** | 2.0 | 0.0% (ref) | *[deferred]* | *[deferred]* | 21.0 ± 5.9 ms |
+| **`-Oz`** | 2.0 | +0.0% | *[deferred]* | *[deferred]* | 21.6 ± 5.5 ms |
+| **`Random`** | 11.1 | +455.0% | *[deferred]* | *[deferred]* | 590.6 ± 147.0 ms |
+| **`Greedy`** | 11.0 | +450.0% | *[deferred]* | *[deferred]* | 6,832.6 ± 668.7 ms |
+| **`Beam`** | 11.0 | +450.0% | *[deferred]* | *[deferred]* | 12,157.2 ± 1,214.9 ms |
+| **`PPO + Autophase`** | 11.0 | +450.0% | *[deferred]* | *[deferred]* | ~11.5 ms (inference) |
+| **`PPO + IR2Vec`** | *[Chunk 8]* | *[Chunk 8]* | *[deferred]* | *[deferred]* | *[Chunk 8]* |
+| **`PPO + Hybrid`** | *[Chunk 8]* | *[Chunk 8]* | *[deferred]* | *[deferred]* | *[Chunk 8]* |
+
+*Notes on table columns:*
+- **Code size & Runtime**: In accordance with the locked research contract, binary code size and execution runtime were explicitly deferred to avoid confounding the primary reward (non-debug IR instruction count reduction).
+- **IR2Vec variants**: The representation ablation study is architected in `src/pipedream/representation/ir2vec.py` and deferred to Chunk 8 pending upstream IR2Vec embedding binaries.
+- **Artifacts**: Summary tables are archived in `results/tables/comparison_table.csv` and `results/tables/comparison_table.md`. Publication figures are saved in `results/figures/` (`instruction_reduction.png`, `optimization_cost.png`, and `bootstrap_differences.png`).
 
 No result is reported from a cherry-picked benchmark. Per-program distributions and failures remain available in raw artifacts.
 

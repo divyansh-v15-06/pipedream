@@ -46,6 +46,7 @@ pipedream-fit-normalizer = "pipedream.cli.fit_normalizer:main"
 pipedream-split-manifest = "pipedream.cli.split_manifest:main"
 pipedream-select-checkpoint = "pipedream.cli.select_checkpoint:main"
 pipedream-report = "pipedream.cli.report:main"
+pipedream-visualize = "pipedream.cli.visualize:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

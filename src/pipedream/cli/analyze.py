@@ -23,9 +23,7 @@ def main(argv: list[str] | None = None) -> int:
         key = _key(row)
         if key not in baseline_by_key:
             raise ValueError(f"candidate row has no paired baseline: {key}")
-        differences.append(
-            float(baseline_by_key[key][args.metric]) - float(row[args.metric])
-        )
+        differences.append(float(baseline_by_key[key][args.metric]) - float(row[args.metric]))
     values = np.asarray(differences, dtype=np.float64)
     result = {
         "baseline": str(args.baseline),

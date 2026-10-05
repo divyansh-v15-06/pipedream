@@ -140,7 +140,9 @@ def _collect_counts(ir_text: str) -> dict[str, int]:
         "function_count": len(function_lines),
         "defined_function_count": len(function_lines),
         "basic_block_count": sum(line.endswith(":") for line in body_lines),
-        "argument_count": sum(len(re.findall(r"%[-.A-Za-z0-9_$]+", line)) for line in function_lines),
+        "argument_count": sum(
+            len(re.findall(r"%[-.A-Za-z0-9_$]+", line)) for line in function_lines
+        ),
         "global_count": sum(line.startswith("@") and " = " in line for line in lines),
         "metadata_count": sum(line.startswith("!") and " = " in line for line in lines),
         "debug_intrinsic_count": ir_text.count("@llvm.dbg."),
@@ -173,7 +175,10 @@ def _has_opcode(line: str, opcode: str) -> bool:
     if line.endswith(":") or "@llvm.dbg." in line:
         return False
     without_assignment = line.split(" = ", 1)[-1]
-    return re.match(rf"(?:tail|musttail|notail)?\s*{re.escape(opcode)}\b", without_assignment) is not None
+    return (
+        re.match(rf"(?:tail|musttail|notail)?\s*{re.escape(opcode)}\b", without_assignment)
+        is not None
+    )
 
 
 FEATURE_OPCODES = frozenset(

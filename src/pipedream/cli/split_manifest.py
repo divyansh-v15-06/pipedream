@@ -21,7 +21,10 @@ def main(argv: list[str] | None = None) -> int:
         validation_fraction=args.validation_fraction,
         source_root=args.input.parent,
     )
-    counts = {split: sum(record.split == split for record in result.records) for split in ("train", "validation", "test")}
+    counts = {
+        split: sum(record.split == split for record in result.records)
+        for split in ("train", "validation", "test")
+    }
     print(f"generated {len(result.records)} records at {args.output}: {counts}")
     return 0
 

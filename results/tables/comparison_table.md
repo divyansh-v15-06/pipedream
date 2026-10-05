@@ -1,0 +1,9 @@
+| Method | Test Programs | Mean Final Instructions | Mean Reduction (%) | Optimization Cost | Change vs -O3 |
+| --- | --- | --- | --- | --- | --- |
+| -O2 | 2 | 2.0 | 92.6 | 21.9 ± 4.3 ms | +0.0% |
+| -O3 | 2 | 2.0 | 92.6 | 21.0 ± 5.9 ms | 0.0% (ref) |
+| -Oz | 2 | 2.0 | 92.6 | 21.6 ± 5.5 ms | +0.0% |
+| PPO (seed 0) | 2 | 11.0 | 58.3 | ~11.5 ms (inference) | +450.0% |
+| greedy | 2 | 11.0 | 58.3 | 6832.6 ± 668.7 ms | +450.0% |
+| beam | 2 | 11.0 | 58.3 | 12157.2 ± 1214.9 ms | +450.0% |
+| random | 2 | 11.1 | 57.9 | 590.6 ± 147.0 ms | +455.0% |
